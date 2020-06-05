@@ -66,18 +66,19 @@ if __name__ == "__main__":
     spin(seq, [17, 18, 27, 22])
     spin(seq, [23, 24, 10, 9])  # spin2
 
-    calibration = (0, 255)
+    rC, gC, bC = (0, 255), (0, 255), (0, 255)
 
     while True:
         r, g, b = sensor.color_rgb_bytes
         print(f"Measured - R: {r}, G: {g}, B: {b}")
 
-        if calibration:
-            updated = [
-                constrain(0, 255, maprange((0, 255), calibration, color))
-                for color in (r, g, b)
-            ]
-            print("Modified - R: {}, G: {}, B: {}".format(*updated))
+        updated = [
+            constrain(0, 255, maprange((0, 255), rC, r)),
+            constrain(0, 255, maprange((0, 255), gC, g)),
+            constrain(0, 255, maprange((0, 255), bC, b)),
+        ]
+        print("Calibrated - R: {}, G: {}, B: {}".format(*updated))
+
 
         print(sensor.color_raw)
         sleep(1)
