@@ -73,9 +73,9 @@ if __name__ == "__main__":
         print(f"Measured - R: {r}, G: {g}, B: {b}")
 
         updated = [
-            constrain(0, 255, maprange((0, 255), rC, r)),
-            constrain(0, 255, maprange((0, 255), gC, g)),
-            constrain(0, 255, maprange((0, 255), bC, b)),
+            constrain(0, 255, maprange(bC, (0, 255), r)),
+            constrain(0, 255, maprange(rC, (0, 255), g)),
+            constrain(0, 255, maprange(gC, (0, 255), b)),
         ]
         print("Calibrated - R: {}, G: {}, B: {}".format(*updated))
 
