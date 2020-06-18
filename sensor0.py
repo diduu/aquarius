@@ -5,20 +5,20 @@ import board
 import busio
 import adafruit_tcs34725
 import RPi.GPIO as GPIO
+import threading
 
 
 def spin(seq, control):
-    GPIO.setmode(GPIO.BCM)
     for pin in control:
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, 0)
 
-    for _ in range(512):
+    while True:
         for halfstep in seq:
             for i, pin in enumerate(control):
                 GPIO.output(pin, halfstep[i])
             sleep(0.001)
-    GPIO.cleanup()
+    
 
 
 def calibrate():
@@ -63,12 +63,29 @@ if __name__ == "__main__":
     i2c = busio.I2C(board.SCL, board.SDA)
     sensor = adafruit_tcs34725.TCS34725(i2c)
 
-    spin(seq, [17, 18, 27, 22])
-    spin(seq, [23, 24, 10, 9])  # spin2
+    #spin(seq, [17, 18, 27, 22])
+    #spin(seq, [23, 24, 10, 9])  # spin2
+    #spin(seq, [9, 10, 24, 23])
+    rC, gC, bC = (23, 145), (23, 45), (16, 143)
 
-    rC, gC, bC = (0, 255), (0, 255), (0, 255)
+    GPIO.setmode(GPIO.BCM)
+    control1 = [17, 18, 27, 22]
+    control2 = [9, 10, 24, 23]
+    motor1 = threading.Thread(target=spin, args=(seq, control1))
+    motor2 = threading.Thread(target=spin, args=(seq, control2))
+    motor1.start()
+    motor2.start()
+    motor1.join()
+    motor2.join()
+    GPIO.cleanup()
 
+    '''
     while True:
+        motor1.start()
+        motor2.start()
+        spin(seq, [17, 18, 27, 22])
+        sleep(0.1)
+        spin(seq, [9, 10, 24, 23])
         r, g, b = sensor.color_rgb_bytes
         print(f"Measured - R: {r}, G: {g}, B: {b}")
 
@@ -82,3 +99,4 @@ if __name__ == "__main__":
 
         print(sensor.color_raw)
         sleep(1)
+    '''
