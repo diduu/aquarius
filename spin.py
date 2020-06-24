@@ -40,14 +40,7 @@ except KeyboardInterrupt:
 finally:
     pi.set_PWM_dutycycle(STEP, 0)  # PWM off
     pi.stop()
-'''
-for x in range(step_count):
-    GPIO.output(STEP, GPIO.HIGH)
-    sleep(delay)
-    GPIO.output(STEP, GPIO.LOW)
-    sleep(delay)
 
-sleep(.5)
 '''
 def generate_ramp(ramp):
     """Generate ramp wave forms.
@@ -76,8 +69,7 @@ def generate_ramp(ramp):
         chain += [255, 0, wid[i], 255, 1, x, y]
 
     pi.wave_chain(chain)  # Transmit chain.
-
-GPIO.cleanup()
+'''
 
 
 
