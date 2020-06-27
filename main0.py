@@ -35,13 +35,13 @@ def sensor():
 # Connect to pigpiod daemon
 pi = pigpio.pi()
 
-def spin(dir, step):
+def spin(direction, step):
     # Set up pins as an output
-    pi.set_mode(dir, pigpio.OUTPUT)
+    pi.set_mode(direction, pigpio.OUTPUT)
     pi.set_mode(step, pigpio.OUTPUT)
 
     # Set direction (1 for clockwise, 0 for anti-clockwise)
-    pi.write(dir, 1)
+    pi.write(direction, 1)
 
     # Set duty cycle and frequency
     pi.set_PWM_dutycycle(step, 255 // 2)  # On-off half of the time
@@ -49,13 +49,15 @@ def spin(dir, step):
 
 
 if __name__ == "__main__":
-    DIR = 20  # Direction GPIO Pin
-    STEP = 21  # Step GPIO Pin
-    spin(DIR, STEP)
+    motors = [(20, 21)]
+    for motor in motors:
+        spin(*motor)
 
     def exit_function(sig, frame):
         print("\nCtrl-C pressed.  Stopping PIGPIO and exiting...")
-        pi.set_PWM_dutycycle(STEP, 0)  # PWM off
+        for motor in motors:
+            pi.set_PWM_dutycycle(motor[1], 0)  # PWM off
+
         pi.stop()
         sys.exit(0)
 
