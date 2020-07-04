@@ -12,12 +12,18 @@ pi = pigpio.pi()
 pi.set_mode(DIR, pigpio.OUTPUT)
 pi.set_mode(STEP, pigpio.OUTPUT)
 
-# Set direction (1 for clockwise, 0 for anti-clockwise)
-pi.write(DIR, 1)
 
-# Set duty cycle and frequency
+pi.write(DIR, 1) # Set direction (1 for clockwise, 0 for anti-clockwise) 
 pi.set_PWM_dutycycle(STEP, 255 // 2)  # On-off half of the time
-pi.set_PWM_frequency(STEP, 500)  # 500 pulses per second
+
+def spin(rotations):
+    FREQ = 500 # Steps per second
+    RESOLUTION = 200 # Steps per revolution
+    waiting_time = (RESOLUTION / FREQ) * rotations
+
+    pi.set_PWM_frequency(STEP, FREQ)  # 500 pulses per second
+    sleep(waiting_time)
+    pi.set_PWM_dutycycle(STEP, 0)  # PWM off
 
 
 def exit_function(sig, frame):
@@ -28,4 +34,5 @@ def exit_function(sig, frame):
 
 
 signal.signal(signal.SIGINT, exit_function)
-signal.pause()
+spin(1)
+#signal.pause()
