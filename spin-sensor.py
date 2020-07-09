@@ -73,15 +73,15 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, exit_function)
 
     # One after the other
-    #spin(26, 20, 0, 70)
+    #spin(26, 20, 0, 50)
     #sleep(1)
-    #spin(19, 20, 1, 10)
+    #spin(19, 20, 0, 0.06)
     #sleep(1)
-    #spin(21, 20, 1, 65)
+    #spin(21, 20, 1, 60) #21 is fill
 
-    rC, gC, bC = (23, 145), (23, 45), (16, 143)
+    rC, gC, bC = (0, 54), (0, 54), (0, 56)
 
-        while True:
+    while True:
         r, g, b = sensor.color_rgb_bytes
         print(f"Measured - R: {r}, G: {g}, B: {b}")
 
@@ -91,4 +91,4 @@ if __name__ == "__main__":
             constrain(0, 255, maprange(bC, (0, 255), b)),
         ]
         print("Calibrated - R: {}, G: {}, B: {}".format(*updated))
-  
+        sleep(1)
