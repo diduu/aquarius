@@ -124,7 +124,6 @@ if __name__ == "__main__":
     counter = 1
 
     while loop:
-        spin(26, 20, 1, 0.075)
         sleep(1)
         sense()
         if(output[0][0] < output[0][2]):
