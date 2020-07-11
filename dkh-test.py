@@ -111,15 +111,14 @@ if __name__ == "__main__":
 
     print("test start")
     spin(21, 20, 1, 29)
-
-
-    spin(26, 20, 1, 0.075)
+    
     
     #sleep(5)
     
     r, g, b = sensor.color_rgb_bytes    
     rC, gC, bC = (0, r), (0, g), (0, b)
-
+    
+    spin(26, 20, 1, 0.075)
     loop = True
     counter = 1
 
@@ -135,7 +134,6 @@ if __name__ == "__main__":
         elif(output[0][0] > output[0][2]):
             print("test end")
             loop = False
-            print(counter)
             print(counter * 0.25)
     
     
