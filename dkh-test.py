@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+
 from time import sleep
+from statistics import mean 
+import time
 import board
 import busio
 import adafruit_tcs34725
@@ -12,6 +15,8 @@ import sys
 
 # Connect to pigpiod daemon
 pi = pigpio.pi()
+
+
 
 def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     # Set up pins as an output
@@ -69,54 +74,72 @@ if __name__ == "__main__":
 
         pi.stop()
         sys.exit(0)
+    
+    
+    output = []
+    def sense():
+        readings = []
+        t_end = time.time() + 1
+        while time.time() < t_end:
+            updated = [
+                constrain(0, 255, maprange(rC, (0, 255), r)),
+                constrain(0, 255, maprange(gC, (0, 255), g)),
+                constrain(0, 255, maprange(bC, (0, 255), b)),
+            ]
+            #print("Calibrated - R: {}, G: {}, B: {}".format(*updated))
+            sleep(0.001)
+            readings.append(updated)
+
+        red = [i[0] for i in readings]
+        green = [i[1] for i in readings]
+        blue = [i[2] for i in readings]
+        #print(red, green, blue)
+        output.append([mean(red), mean(green), mean(blue)])
 
     signal.signal(signal.SIGINT, exit_function)
 
-    # One after the other
-    #spin(26, 20, 0, 50) #flush
-    #sleep(1)
-    #spin(19, 20, 0, 0.15) #reagent
-    #sleep(1)
-    #spin(21, 20, 1, 60) #fill
+
+    print("Flush 1")
+    spin(19, 20, 1, 70)
     
-    #spin(21, 20, 1, 58)
-    #spin(26, 20, 0, 70)
-    #spin(19, 20, 1, 20)
-
-    spin(26, 20, 0, 70)
+    print("fill 1")
     spin(21, 20, 1, 58)
-    spin(26, 20, 0, 100)
-    spin(21, 20, 1, 29)
-    #spin(26, 20, 0, 20)
-    spin(19, 20, 0, 0.15)
-    sleep(5)
 
-    rC, gC, bC = (0, 37), (0, 44), (0, 53)
+    print("flush 2")
+    spin(19, 20, 1, 70)
+
+
+    print("test start")
+    spin(21, 20, 1, 29)
+
+
+    spin(26, 20, 1, 0.075)
+    
+    #sleep(5)
+    
+    r, g, b = sensor.color_rgb_bytes    
+    rC, gC, bC = (0, r), (0, g), (0, b)
 
     loop = True
     counter = 1
-    
+
     while loop:
-        r, g, b = sensor.color_rgb_bytes
-
-        updated = [
-            constrain(0, 255, maprange(rC, (0, 255), r)),
-            constrain(0, 255, maprange(gC, (0, 255), g)),
-            constrain(0, 255, maprange(bC, (0, 255), b)),
-        ]
-
-        if(updated[0] < updated[2]):
-            spin(19, 20, 0, 0.15)
+        spin(26, 20, 1, 0.075)
+        sleep(1)
+        sense()
+        if(output[0][0] < output[0][2]):
+            output.pop(0)
+            spin(26, 20, 1, 0.075)
             counter += 1
             print(str(counter) + ": " + str(updated))
-            sleep(5)
-        elif(updated[0] > updated[2]):
+            sleep(1)
+        elif(output[0][0] > output[0][2]):
             print("test end")
             loop = False
             print(counter)
-            print(counter * 0.5)
+            print(counter * 0.25)
     
-            
+    
 
 
 
