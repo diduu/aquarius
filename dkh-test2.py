@@ -59,8 +59,8 @@ if __name__ == "__main__":
         sys.exit(0)
     
     
-    def sensor():
-        rC, gC, bC = (23, 145), (23, 45), (16, 143)
+    def sensor(rC, gC, bC):
+        # rC, gC, bC = (23, 145), (23, 45), (16, 143)
 
         r, g, b = sensor.color_rgb_bytes
         print(f"Measured - R: {r}, G: {g}, B: {b}")
@@ -80,13 +80,16 @@ if __name__ == "__main__":
     # FILL
     # FLUSH
     # FILL TO 5 ML
+    
+    r, g, b = sensor.color_rgb_bytes
+    rC, gC, bC = (0, r), (0, g), (0, b)
 
     while CONDITION:
         # ADD REAGENT
         avgR, avgG, avgB = [], [], []
         measures = 50
         for x in range(measures):
-            new_val = sensor()
+            new_val = sensor(rC, gC, bC)
             avgR += [new_val[0]]
             avgG += [new_val[1]]
             avgB += [new_val[2]]
