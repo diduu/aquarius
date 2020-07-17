@@ -1,16 +1,24 @@
 import RPi.GPIO as GPIO
+
+
+
 from time import sleep
-from AMSpi import AMSpi
+GPIO.setmode(GPIO.BCM)
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)
+GPIO.setup(13, GPIO.OUT)
 
-GPIO.setup(07, GPIO.OUT)
-GPIO.setup(07, GPIO.OUT)
-GPIO.setup(07, GPIO.OUT)
-
-pwm=GPIO.PWM(07, 100)
+pwm=GPIO.PWM(13, 100)
 pwm.start(0)
 
-with AMSpi() as amspi:
-	amspi.set_L293D_pins(5)
-	amspi.run_dc_motor(amspi.DC_Motor_1)
+
+GPIO.output(5, True)
+GPIO.output(6, False)
+
+
+pwm.ChangeDutyCycle(100)
+GPIO.output(13, True)
+sleep(20)
+pwm.ChangeDutyCycle(0)
+GPIO.output(13, False)
