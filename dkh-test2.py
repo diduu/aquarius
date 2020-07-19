@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-
+from picamera import PiCamera
+from PIL import Image
+import PIL
 from time import sleep
 from statistics import mean 
 import time
@@ -12,10 +14,24 @@ import threading
 import pigpio
 import signal
 import sys
+import csv
+import datetime
+from twilio.rest import Client
+
 
 # Connect to pigpiod daemon
 pi = pigpio.pi()
+camera = PiCamera()
 
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)
+GPIO.setup(13, GPIO.OUT)
+pwm=GPIO.PWM(13, 100)
+pwm.start(0)
+GPIO.output(5, True)
+GPIO.output(6, False)
 
 
 def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
@@ -35,6 +51,25 @@ def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     pi.set_PWM_dutycycle(STEP, 0)  # PWM off
 
 
+def dc_motor():
+    pwm.ChangeDutyCycle(100)
+    GPIO.output(13, True)
+    sleep(3)
+    pwm.ChangeDutyCycle(0)
+    GPIO.output(13, False)
+
+def output(dkh):
+    now = datetime.datetime.now()
+    a = [[now.strftime('%Y-%m-%d' + ' %H:%M:%S')], [dkh]]
+    with open('results.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(a)
+    client = Client("ACf293bb7be0b3c5d6d3a670b1b2365890", "f000f6e09584a0b8557283228abdb3a9")
+    client.messages.create(to="+447905843784", 
+                       from_="+12512573510", 
+                       body="Your DKH was tested at: " + now.strftime('%Y-%m-%d' + ' %H:%M:%S\n' + "DKH Value: " + str(dkh)))
+
+
 def maprange(origin_range, target_range, value):
     (a1, a2), (b1, b2) = origin_range, target_range
     return b1 + ((value - a1) * (b2 - b1) / (a2 - a1))
@@ -45,8 +80,14 @@ def constrain(min_val, max_val, value):
 
 
 if __name__ == "__main__":
-    i2c = busio.I2C(board.SCL, board.SDA)
-    sensor = adafruit_tcs34725.TCS34725(i2c)
+    correction_factor = 0.308
+    XL = 300
+    XR = 600
+    YB = 215
+    YT = 290
+    pixels = (XR - XL) * (YT - YB)
+
+    avgR, avgG, avgB = 0, 0, 0 
 
     threads = []
 
@@ -57,44 +98,65 @@ if __name__ == "__main__":
 
         pi.stop()
         sys.exit(0)
+
+
+    print("Priming Reagent")
+    spin(21, 20, 1, 1)
+
+    print("Flush 1")
+    spin(19, 20, 1, 70)
+
+    print("Fill 1")
+    spin(26, 20, 1, 58)
     
+    dc_motor()
     
-    def sensor(rC, gC, bC):
-        # rC, gC, bC = (23, 145), (23, 45), (16, 143)
+    print("Flush 2")
+    spin(19, 20, 1, 70)
 
-        r, g, b = sensor.color_rgb_bytes
-        print(f"Measured - R: {r}, G: {g}, B: {b}")
-
-        updated = [
-            constrain(0, 255, maprange(rC, (0, 255), r)),
-            constrain(0, 255, maprange(gC, (0, 255), g)),
-            constrain(0, 255, maprange(bC, (0, 255), b)),
-        ]
-        print("Calibrated - R: {}, G: {}, B: {}".format(*updated))
-        return updates
-
-    signal.signal(signal.SIGINT, exit_function)
-
-    # PRIME
-    # FLUSH
-    # FILL
-    # FLUSH
-    # FILL TO 5 ML
     
-    r, g, b = sensor.color_rgb_bytes
-    rC, gC, bC = (0, r), (0, g), (0, b)
+    print("Test Start")
+    spin(26, 20, 1, 58)
 
-    while CONDITION:
-        # ADD REAGENT
-        avgR, avgG, avgB = [], [], []
-        measures = 50
-        for x in range(measures):
-            new_val = sensor(rC, gC, bC)
-            avgR += [new_val[0]]
-            avgG += [new_val[1]]
-            avgB += [new_val[2]]
-            sleep(2/measures)
+    print("Adding Reagent")
+    spin(21, 20, 1, 0.15)
+    
+    loop = True
+    counter = 1
 
-        avgR = sum(avgR) / len(avgR)
-        avgG = sum(avgG) / len(avgG)
-        avgB = sum(avgB) / len(avgB)
+    while loop:
+        spin(21, 20, 1, 0.15) 
+        avgR, avgG, avgB = 0, 0, 0 
+        counter += 1
+        dc_motor()
+        sleep(2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        print(str(counter) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(R < B):
+            continue
+        elif(B < R):
+            print("Test Finished")
+            dkh = counter * correction_factor
+            output(dkh)
+            loop = False
+
+           
+
+
+
+
+
+
