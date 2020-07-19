@@ -64,7 +64,11 @@ def output(dkh):
     with open('results.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(a)
+<<<<<<< HEAD
+    client = Client("", "")
+=======
     client = Client("xxx", "yyy")
+>>>>>>> cbff9f9a26ce4f2d15bde1ba7cd2863f9f29e309
     client.messages.create(to="+447905843784", 
                        from_="+12512573510", 
                        body="Your DKH was tested at: " + now.strftime('%Y-%m-%d' + ' %H:%M:%S\n' + "DKH Value: " + str(dkh)))
@@ -81,10 +85,10 @@ def constrain(min_val, max_val, value):
 
 if __name__ == "__main__":
     correction_factor = 0.308
-    XL = 300
-    XR = 600
-    YB = 215
-    YT = 290
+    XL = 280
+    XR = 631
+    YB = 383
+    YT = 560
     pixels = (XR - XL) * (YT - YB)
 
     avgR, avgG, avgB = 0, 0, 0 
@@ -100,7 +104,6 @@ if __name__ == "__main__":
         sys.exit(0)
 
 
-    print("Priming Reagent")
     spin(21, 20, 1, 1)
 
     print("Flush 1")
@@ -145,12 +148,12 @@ if __name__ == "__main__":
         G = avgG / pixels
         B = avgB / pixels
         print(str(counter) + ": " + str(R) + ", " + str(G) + ", " + str(B))
-        if(R < B):
+        if(counter < 5 or (R < B and G < B)):
             continue
-        elif(B < R):
+        else:
             print("Test Finished")
             dkh = counter * correction_factor
-            output(dkh)
+            output(round(dkh, 2))
             loop = False
 
            
