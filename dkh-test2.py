@@ -64,7 +64,7 @@ def output(dkh):
     with open('results.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(a)
-    client = Client("ACf293bb7be0b3c5d6d3a670b1b2365890", "f000f6e09584a0b8557283228abdb3a9")
+    client = Client("xxx", "yyy")
     client.messages.create(to="+447905843784", 
                        from_="+12512573510", 
                        body="Your DKH was tested at: " + now.strftime('%Y-%m-%d' + ' %H:%M:%S\n' + "DKH Value: " + str(dkh)))
