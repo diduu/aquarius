@@ -64,7 +64,11 @@ def output(dkh):
     with open('results.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(a)
+<<<<<<< HEAD
     client = Client("ACf293bb7be0b3c5d6d3a670b1b2365890", "2e4dd1d3cfd265c1a409f224635d04a3")
+=======
+    client = Client("", "")
+>>>>>>> f8fb02076c93204eb8a6d7ec3a080e0e21baaa47
     client.messages.create(to="+447905843784", 
                        from_="+12512573510", 
                        body="Your DKH was tested at: " + now.strftime('%Y-%m-%d' + ' %H:%M:%S\n' + "DKH Value: " + str(dkh)))
@@ -100,7 +104,11 @@ if __name__ == "__main__":
         sys.exit(0)
 
 
+<<<<<<< HEAD
     #spin(21, 20, 1, 1)
+=======
+    spin(21, 20, 1, 1)
+>>>>>>> f8fb02076c93204eb8a6d7ec3a080e0e21baaa47
 
     print("Flush 1")
     spin(19, 20, 1, 70)
