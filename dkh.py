@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 from picamera import PiCamera
-from PIL import Image
 import PIL
+from PIL import Image
 from time import sleep
 from statistics import mean 
 import time
 import board
 import busio
-import adafruit_tcs34725
+#import adafruit-tcs34725
 import RPi.GPIO as GPIO
 import threading
 import pigpio
@@ -21,18 +21,38 @@ from twilio.rest import Client
 
 # Connect to pigpiod daemon
 pi = pigpio.pi()
-camera = PiCamera()
+#camera = PiCamera()
 
 
+#####TOP DC##### 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(5, GPIO.OUT)
-GPIO.setup(6, GPIO.OUT)
-GPIO.setup(13, GPIO.OUT)
-pwm=GPIO.PWM(13, 100)
+GPIO.setup(2, GPIO.OUT)
+GPIO.setup(3, GPIO.OUT)
+GPIO.setup(4, GPIO.OUT)
+pwm=GPIO.PWM(4, 100)
 pwm.start(0)
-GPIO.output(5, True)
-GPIO.output(6, False)
+GPIO.output(2, True)
+GPIO.output(3, False)
 
+
+#####MIDDLE DC##### 
+GPIO.setup(9, GPIO.OUT)
+GPIO.setup(10, GPIO.OUT)
+GPIO.setup(11, GPIO.OUT)
+pwm2=GPIO.PWM(11, 100)
+pwm2.start(0)
+GPIO.output(9, True)
+GPIO.output(10, False)
+
+
+#####BOTTOM DC##### 
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(12, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)
+pwm3=GPIO.PWM(6, 100)
+pwm3.start(0)
+GPIO.output(5, True)
+GPIO.output(12, False)
 
 def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     # Set up pins as an output
@@ -51,12 +71,27 @@ def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     pi.set_PWM_dutycycle(STEP, 0)  # PWM off
 
 
-def dc_motor():
+def top_dc():
     pwm.ChangeDutyCycle(100)
-    GPIO.output(13, True)
+    GPIO.output(4, True)
     sleep(3)
     pwm.ChangeDutyCycle(0)
-    GPIO.output(13, False)
+    GPIO.output(4, False)
+
+def middle_dc():
+    pwm2.ChangeDutyCycle(100)
+    GPIO.output(11, True)
+    sleep(1)
+    pwm2.ChangeDutyCycle(0)
+    GPIO.output(11, False)
+
+def bottom_dc():
+    pwm3.ChangeDutyCycle(100)
+    GPIO.output(6, True)
+    sleep(1)
+    pwm3.ChangeDutyCycle(0)
+    GPIO.output(6, False)
+
 
 def output(dkh):
     now = datetime.datetime.now()
@@ -77,6 +112,8 @@ def maprange(origin_range, target_range, value):
 
 def constrain(min_val, max_val, value):
     return max(min_val, min(max_val, value))
+
+#def reprime():
 
 
 if __name__ == "__main__":
@@ -100,8 +137,19 @@ if __name__ == "__main__":
         sys.exit(0)
 
 
-    #spin(21, 20, 1, 1)
-
+    #top_dc()
+    #middle_dc()
+    #bottom_dc()
+    #spin(21, 20, 1, 57.677777778)
+    #spin(21, 20, 0, 57.677777778)
+    #spin(21, 20, 1, 57.677777778)
+    #spin(21, 20, 0, 57.677777778)
+    #spin(21, 20, 1, 57.677777778)
+    spin(21, 20, 1, 57.677777778)
+    spin(21, 20, 1, 2.5)
+    spin(21, 20, 0, 2.5)
+    
+    '''
     print("Flush 1")
     spin(19, 20, 1, 70)
 
@@ -152,7 +200,7 @@ if __name__ == "__main__":
             output(round(dkh, 2))
             loop = False
     
-           
+    '''    
 
 
 
