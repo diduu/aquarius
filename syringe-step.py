@@ -4,8 +4,7 @@ import RPi.GPIO as GPIO
 DIR = 20   # Direction GPIO Pin
 STEP = 21  # Step GPIO Pin
 CW = 1     # Clockwise Rotation
-CCW = 0    # Counterclockwise Rotation
-SPR = 20   # Steps per Revolution (360 / 18)
+SPR = 48   # Steps per Revolution (360 / 18)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(DIR, GPIO.OUT)
@@ -20,19 +19,11 @@ RESOLUTION = {'Full': (0, 0, 0),
               '1/8': (1, 1, 0),
               '1/16': (0, 0, 1),
               '1/32': (1, 0, 1)}
-GPIO.output(MODE, RESOLUTION['1/32'])
+GPIO.output(MODE, RESOLUTION['Full'])
 
-step_count = SPR * 32 * 8
-delay = .005 / 32
+step_count = SPR
+delay = .0208
 
-for x in range(step_count):
-    GPIO.output(STEP, GPIO.HIGH)
-    sleep(delay)
-    GPIO.output(STEP, GPIO.LOW)
-    sleep(delay)
-
-sleep(.5)
-GPIO.output(DIR, CCW)
 for x in range(step_count):
     GPIO.output(STEP, GPIO.HIGH)
     sleep(delay)
