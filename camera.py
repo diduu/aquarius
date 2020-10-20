@@ -4,10 +4,10 @@ import PIL
 from time import sleep
 
 avgR, avgG, avgB = 0, 0, 0 
-XL = 570
-XR = 670
-YB = 171
-YT = 271
+XL = 650
+XR = 790
+YB = 459
+YT = 520
 pixels = (XR - XL) * (YT - YB)
 
 camera = PiCamera()
