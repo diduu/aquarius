@@ -4,8 +4,8 @@ import PIL
 from time import sleep
 
 avgR, avgG, avgB = 0, 0, 0 
-XL = 720
-XR = 760
+XL = 610
+XR = 650
 YB = 200
 YT = 230
 pixels = (XR - XL) * (YT - YB)
