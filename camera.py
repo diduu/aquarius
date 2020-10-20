@@ -19,7 +19,7 @@ camera.stop_preview()
 image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
 image_rgb = image.convert("RGB")
 
-for no in range(10):
+for k in range(10):
 	for x in range(XL, XR):
 	    for y in range(YB, YT):
 		rgb_pixel_value = image_rgb.getpixel((x, y))
@@ -30,7 +30,7 @@ for no in range(10):
 	G = avgG / pixels
 	B = avgB / pixels
 	print(round(R), round(G), round(G))
-	sleep(1)
+sleep(1)
 '''
 measures = 5
 for x in range(measures):
