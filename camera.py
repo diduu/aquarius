@@ -26,10 +26,10 @@ for x in range(XL, XR):
          avgR += rgb_pixel_value[0]
          avgG += rgb_pixel_value[1]
          avgB += rgb_pixel_value[2]
- R = avgR / pixels
- G = avgG / pixels
- B = avgB / pixels
- print(round(R), round(G), round(G))
+R = avgR / pixels
+G = avgG / pixels
+B = avgB / pixels
+print(round(R), round(G), round(G))
 
 '''
 measures = 5
