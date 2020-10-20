@@ -21,7 +21,7 @@ from twilio.rest import Client
 
 # Connect to pigpiod daemon
 pi = pigpio.pi()
-#camera = PiCamera()
+
 
 
 #####TOP DC##### 
@@ -54,6 +54,10 @@ pwm3.start(0)
 GPIO.output(5, True)
 GPIO.output(12, False)
 
+global total
+
+
+
 def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     # Set up pins as an output
     pi.set_mode(DIR, pigpio.OUTPUT)
@@ -71,26 +75,61 @@ def spin(STEP, DIR, direction, rotations): # Rotations doesn't need to be an int
     pi.set_PWM_dutycycle(STEP, 0)  # PWM off
 
 
-def top_dc():
+def big_mixer():
     pwm.ChangeDutyCycle(100)
     GPIO.output(4, True)
-    sleep(3)
+    sleep(2)
     pwm.ChangeDutyCycle(0)
     GPIO.output(4, False)
 
-def middle_dc():
+def medium_mixer():
+    pwm.ChangeDutyCycle(100)
+    GPIO.output(4, True)
+    sleep(1)
+    pwm.ChangeDutyCycle(0)
+    GPIO.output(4, False)
+
+def mixer():
+    pwm.ChangeDutyCycle(100)
+    GPIO.output(4, True)
+    sleep(0.2)
+    pwm.ChangeDutyCycle(0)
+    GPIO.output(4, False)
+
+def flush():
     pwm2.ChangeDutyCycle(100)
     GPIO.output(11, True)
-    sleep(1)
+    sleep(5)
     pwm2.ChangeDutyCycle(0)
     GPIO.output(11, False)
 
-def bottom_dc():
+def fill():
     pwm3.ChangeDutyCycle(100)
     GPIO.output(6, True)
-    sleep(1)
+    sleep(3)
     pwm3.ChangeDutyCycle(0)
     GPIO.output(6, False)
+
+
+def camera():
+    camera.start_preview(alpha=200)
+    camera.capture('/home/pi/aquarius/images/image.jpg')
+    camera.stop_preview()
+    image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+    image_rgb = image.convert("RGB")
+    for x in range(XL, XR):
+        for y in range(YB, YT):
+            rgb_pixel_value = image_rgb.getpixel((x, y))
+            avgR += rgb_pixel_value[0]
+            avgG += rgb_pixel_value[1]
+            avgB += rgb_pixel_value[2]
+    R = avgR / pixels
+    G = avgG / pixels
+    B = avgB / pixels
+    RGB = (R, G, B)
+    writer.writerow(RGB)
+    print(str(counter) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+
 
 
 def output(dkh):
@@ -113,16 +152,296 @@ def maprange(origin_range, target_range, value):
 def constrain(min_val, max_val, value):
     return max(min_val, min(max_val, value))
 
-#def reprime():
+def test():
+    loop = True
+    loop2 = False
+    loop3 = False
+    loop4 = False
+    counter1 = 0
+    while loop:
+        spin(21, 20, 0, 4.615) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter1 += 100
+        #mixer()
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer.writerow(RGB)
+        print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(G > B):
+            continue
+        elif(B > G and R > 20):
+            loop = False
+            loop2 = True
+        elif(B > G and R < 20):
+            loop = False
+            loop3 = True
+        
+    while loop2:
+        spin(21, 20, 0, 2.3075) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter1 += 50
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer.writerow(RGB)
+        print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > G and R > 20):
+            continue
+        else:
+            loop2 = False
+            loop3 = True
+
+    while loop3:
+        spin(21, 20, 0, 1.15375) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter1 += 25
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer.writerow(RGB)
+        print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > 105 and R < 20):
+            continue
+        else:
+            loop3 = False
+            loop4 = True
+    
+   
+    while loop4:
+        spin(21, 20, 0, 0.04615) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter1 += 1
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer.writerow(RGB)
+        print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > G and R < 20):
+            continue
+        elif(B < G and R > 20):
+            dkh1 = ((counter1 * 0.001) * 27.808656036)
+            print(dkh1)
+            reprime = ((counter1 * 0.04615) + 2)
+            spin(21, 20, 1, reprime)
+            row_count = len(list(reader))
+            results.close()
+            loop4 = False      
+
+def test2():
+    loop5 = True
+    loop6 = False
+    loop7 = False
+    loop8 = False
+    counter2 = 0
+    while loop5:
+        spin(21, 20, 0, 4.615) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter2 += 100
+        #mixer()
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer2.writerow(RGB)
+        print(str(counter2) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(G > B):
+            continue
+        elif(B > G and R > 20):
+            loop5 = False
+            loop6 = True
+        elif(B > G and R < 20):
+            loop5 = False
+            loop7 = True
+        
+    while loop6:
+        spin(21, 20, 0, 2.3075) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter2 += 50
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer2.writerow(RGB)
+        print(str(counter2) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > G and R > 20):
+            continue
+        else:
+            loop6 = False
+            loop7 = True
+
+    while loop7:
+        spin(21, 20, 0, 1.15375) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter2 += 25
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer2.writerow(RGB)
+        print(str(counter2) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > 105 and R < 20):
+            continue
+        else:
+            loop7 = False
+            loop8 = True
+    
+    while loop8:
+        spin(21, 20, 0, 0.04615) 
+        mixer()
+        avgR, avgG, avgB = 0, 0, 0 
+        counter2 += 1
+        #mixer1)
+        sleep(0.2)
+        camera.start_preview(alpha=200)
+        camera.capture('/home/pi/aquarius/images/image.jpg')
+        camera.stop_preview()
+        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
+        image_rgb = image.convert("RGB")
+        for x in range(XL, XR):
+            for y in range(YB, YT):
+                rgb_pixel_value = image_rgb.getpixel((x, y))
+                avgR += rgb_pixel_value[0]
+                avgG += rgb_pixel_value[1]
+                avgB += rgb_pixel_value[2]
+        R = avgR / pixels
+        G = avgG / pixels
+        B = avgB / pixels
+        RGB = (R, G, B)
+        writer2.writerow(RGB)
+        print(str(counter2) + ": " + str(R) + ", " + str(G) + ", " + str(B))
+        if(B > G and R < 20):
+            continue
+        elif(B < G and R > 20):
+            dkh2 = ((counter2 * 0.001) * 27.808656036)
+            print(dkh2)
+            reprime = ((counter2 * 0.04615) + 2)
+            spin(21, 20, 1, reprime)
+            row_count2 = len(list(reader2))
+            results2.close()
+            loop8 = False      
 
 
 if __name__ == "__main__":
     correction_factor = 0.308
-    XL = 342
-    XR = 495
-    YB = 351
-    YT = 443
+    XL = 310
+    XR = 360
+    YB = 109
+    YT = 134
     pixels = (XR - XL) * (YT - YB)
+    dkh1 = 0
+    dkh2 = 0
+
+    camera = PiCamera()
+
+    results = open('results.csv','r+', newline='') 
+    writer = csv.writer(results)
+    reader = csv.reader(results)
+
+    results2 = open('results2.csv','r+', newline='') 
+    writer2 = csv.writer(results2)
+    reader2 = csv.reader(results2)
+
 
     avgR, avgG, avgB = 0, 0, 0 
 
@@ -138,72 +457,106 @@ if __name__ == "__main__":
 
 
     #top_dc()
-    #middle_dc()
-    #bottom_dc()
+    #flush()
+    #fill()
+    #for x in range(50):
+    #    mixer()
+    #    sleep(0.1)
+    #flush()
+    #spin(21, 20, 0, 1)
+
+    #spin(21, 20, 0, 5)
     #spin(21, 20, 1, 57.677777778)
     #spin(21, 20, 0, 57.677777778)
     #spin(21, 20, 1, 57.677777778)
-    #spin(21, 20, 0, 57.677777778)
     #spin(21, 20, 1, 57.677777778)
-    spin(21, 20, 1, 57.677777778)
-    spin(21, 20, 1, 2.5)
-    spin(21, 20, 0, 2.5)
+    #
+    #spin(21, 20, 1, 2)
+    #spin(21, 20, 0, 1)
+
     
-    '''
+    #spin(21, 20, 1, 1)
+    #spin(21, 20, 0, 1)
+    #spin(21, 20, 1, 1)
+    #spin(21, 20, 0, 1)
+    #spin(21, 20, 1, 1)
+    #spin(21, 20, 0, 46.15)
+    #spin(21, 20, 0, 46.15)
+
+    #spin(21, 20, 1, 6.615)
+    #spin(21, 20, 0, 2)
+    #
+    #spin(21, 20, 1, 5) ]
+    
+    #spin(21, 20, 0, 0.5)
+
+    #flush()
+    #print("Adding Reagent")
+    #spin(21, 20, 0, 4.615)
+
+    
+
+    #spin(21, 20, 1, 23.5059)
+    #fill()
+
+    #spin(21, 20, 0, 7)
+
+    
+    
+    #flush()
+    #spin(21, 20, 1, 2)
+    spin(21, 20, 0, 2)
+
+    
     print("Flush 1")
-    spin(19, 20, 1, 70)
-
+    flush()
     print("Fill 1")
-    spin(26, 20, 1, 58)
+    fill()
     
-    dc_motor()
-    
+    mixer()
     print("Flush 2")
-    spin(19, 20, 1, 70)
-
-    
+    flush()
+    print("Fill 2")
+    fill()
+    mixer()
+    print("Flush 3")
+    flush()
     print("Test Start")
-    spin(26, 20, 1, 58)
+    fill()
+
+    test()
+
+
     
-    print("Adding Reagent")
-    spin(21, 20, 1, 0.15)
+    #row_count = len(list(reader))
+    #spin(21, 20, 1, 23.36745)
+    spin(21, 20, 0, 2)
+
+    #counter = 0
+
+    #spin(21, 20, 0, 2)
+    print("Flush 1")
+    flush()
+    print("Fill 1")
+    fill()
+    mixer()
+    print("Flush 2")
+    flush()
+    print("Fill 2")
+    fill()
+    mixer()
+    print("Flush 3")
+    flush()
+    print("Test Start")
+    fill()
     
-    loop = True
-    counter = 1
-
-    while loop:
-        spin(21, 20, 1, 0.15) 
-        avgR, avgG, avgB = 0, 0, 0 
-        counter += 1
-        dc_motor()
-        sleep(2)
-        camera.start_preview(alpha=200)
-        camera.capture('/home/pi/aquarius/images/image.jpg')
-        camera.stop_preview()
-        image = PIL.Image.open("/home/pi/aquarius/images/image.jpg")
-        image_rgb = image.convert("RGB")
-        for x in range(XL, XR):
-            for y in range(YB, YT):
-                rgb_pixel_value = image_rgb.getpixel((x, y))
-                avgR += rgb_pixel_value[0]
-                avgG += rgb_pixel_value[1]
-                avgB += rgb_pixel_value[2]
-        R = avgR / pixels
-        G = avgG / pixels
-        B = avgB / pixels
-        print(str(counter) + ": " + str(R) + ", " + str(G) + ", " + str(B))
-        if(counter < 5 or (R < B and G < B)):
-            continue
-        else:
-            print("Test Finished")
-            dkh = counter * correction_factor
-            output(round(dkh, 2))
-            loop = False
+    test2()
+    print(str((row_count +  row_count2) / 2))
     
-    '''    
+    
+    
+    
 
-
-
-
-
-
+    
+    
+           

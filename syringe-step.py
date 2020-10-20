@@ -1,33 +1,46 @@
 from time import sleep
-import RPi.GPIO as GPIO
+import pigpio
+import signal
+import sys
 
-DIR = 20   # Direction GPIO Pin
+DIR = 20  # Direction GPIO Pin
 STEP = 21  # Step GPIO Pin
-CW = 1     # Clockwise Rotation
-SPR = 48   # Steps per Revolution (360 / 18)
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(DIR, GPIO.OUT)
-GPIO.setup(STEP, GPIO.OUT)
-GPIO.output(DIR, CW)
+# Connect to pigpiod daemon
+pi = pigpio.pi()
 
-MODE = (14, 15, 18)   # Microstep Resolution GPIO Pins
-GPIO.setup(MODE, GPIO.OUT)
-RESOLUTION = {'Full': (0, 0, 0),
-              'Half': (1, 0, 0),
-              '1/4': (0, 1, 0),
-              '1/8': (1, 1, 0),
-              '1/16': (0, 0, 1),
-              '1/32': (1, 0, 1)}
-GPIO.output(MODE, RESOLUTION['Full'])
+# Set up pins as an output
+pi.set_mode(DIR, pigpio.OUTPUT)
+pi.set_mode(STEP, pigpio.OUTPUT)
 
-step_count = SPR
-delay = .0208
+# Set Microstepping mode
+MODE = (14, 15, 18)  # Microstep Resolution GPIO Pins
+RESOLUTION = {
+ "Full": (0, 0, 0),
+ "Half": (1, 0, 0),
+ "1/4": (0, 1, 0),
+ "1/8": (1, 1, 0),
+ "1/16": (0, 0, 1),
+ "1/32": (1, 0, 1),
+}
 
-for x in range(step_count):
-    GPIO.output(STEP, GPIO.HIGH)
-    sleep(delay)
-    GPIO.output(STEP, GPIO.LOW)
-    sleep(delay)
+for i, pin in enumerate(MODE):
+ pi.write(pin, RESOLUTION["Full"][i])
 
-GPIO.cleanup()
+# Set direction (1 for clockwise, 0 for anti-clockwise)
+pi.write(DIR, 1)
+
+# Set duty cycle and frequency
+pi.set_PWM_dutycycle(STEP, 255 // 2)  # On-off half of the time
+pi.set_PWM_frequency(STEP, 500)  # 500 pulses per second
+
+
+def exit_function(sig, frame):
+ print("\nCtrl-C pressed.  Stopping PIGPIO and exiting...")
+ pi.set_PWM_dutycycle(STEP, 0)  # PWM off
+ pi.stop()
+ sys.exit(0)
+
+
+signal.signal(signal.SIGINT, exit_function)
+signal.pause()
