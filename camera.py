@@ -30,7 +30,7 @@ for x in range(XL, XR):
 R = avgR / pixels
 G = avgG / pixels
 B = avgB / pixels
-print(round(R), round(G), round(G))
+print(round(R), round(G), round(B))
 
 '''
 measures = 5
