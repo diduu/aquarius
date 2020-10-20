@@ -12,7 +12,7 @@ pixels = (XR - XL) * (YT - YB)
 
 camera = PiCamera()
 camera.start_preview(alpha=200)
-camera.brightness = 60
+camera.brightness = 65
 camera.resolution = (1280, 720)
 
 camera.capture('/home/pi/aquarius/images/image.jpg')
