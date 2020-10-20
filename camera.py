@@ -21,15 +21,15 @@ image_rgb = image.convert("RGB")
 
 
 for x in range(XL, XR):
-    for y in range(YB, YT):
-	rgb_pixel_value = image_rgb.getpixel((x, y))
-	avgR += rgb_pixel_value[0]
-	avgG += rgb_pixel_value[1]
-	avgB += rgb_pixel_value[2]
-R = avgR / pixels
-G = avgG / pixels
-B = avgB / pixels
-print(round(R), round(G), round(G))
+     for y in range(YB, YT):
+         rgb_pixel_value = image_rgb.getpixel((x, y))
+         avgR += rgb_pixel_value[0]
+         avgG += rgb_pixel_value[1]
+         avgB += rgb_pixel_value[2]
+ R = avgR / pixels
+ G = avgG / pixels
+ B = avgB / pixels
+ print(round(R), round(G), round(G))
 
 '''
 measures = 5
