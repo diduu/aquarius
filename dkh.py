@@ -505,6 +505,8 @@ if __name__ == "__main__":
     
     #flush()
     #spin(21, 20, 1, 2)
+    mixer()
+    '''
     spin(21, 20, 0, 2)
 
     
@@ -552,7 +554,7 @@ if __name__ == "__main__":
     
     test2()
     print(str((row_count +  row_count2) / 2))
-    
+    '''
     
     
     
