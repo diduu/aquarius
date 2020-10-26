@@ -207,7 +207,7 @@ def test():
             print(dkh1)
             reprime = ((counter1 * 0.04615) + 2)
             spin(21, 20, 1, reprime)
-            row_count = len(list(reader))
+            # row_count = len(list(reader))
             results.close()
             loop4 = False      
 
@@ -359,9 +359,10 @@ if __name__ == "__main__":
 
     camera = PiCamera()
 
-    results = open('results.csv','r+', newline='') 
+    new_name = f"{datetime.timestamp(datetime.now())}.csv"
+    results = open(new_name, 'w', newline='') 
     writer = csv.writer(results)
-    reader = csv.reader(results)
+    # reader = csv.reader(results)
 
     #results2 = open('results2.csv','r+', newline='') 
     #writer2 = csv.writer(results2)
