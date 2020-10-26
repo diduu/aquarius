@@ -180,7 +180,7 @@ def test():
         G = avgG / pixels
         B = avgB / pixels
         RGB = (R, G, B)
-        writer.writerow(RGB)
+        #writer.writerow(RGB)
         print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
         if(G > B):
             continue
@@ -213,7 +213,7 @@ def test():
         G = avgG / pixels
         B = avgB / pixels
         RGB = (R, G, B)
-        writer.writerow(RGB)
+        #writer.writerow(RGB)
         print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
         if(B > G and R > 20):
             continue
@@ -243,7 +243,7 @@ def test():
         G = avgG / pixels
         B = avgB / pixels
         RGB = (R, G, B)
-        writer.writerow(RGB)
+        #writer.writerow(RGB)
         print(str(counter1) + ": " + str(R) + ", " + str(G) + ", " + str(B))
         if(B > 105 and R < 20):
             continue
@@ -287,6 +287,7 @@ def test():
             results.close()
             loop4 = False      
 
+'''
 def test2():
     loop5 = True
     loop6 = False
@@ -420,14 +421,14 @@ def test2():
             row_count2 = len(list(reader2))
             results2.close()
             loop8 = False      
-
+'''
 
 if __name__ == "__main__":
     correction_factor = 0.308
-    XL = 310
-    XR = 360
-    YB = 109
-    YT = 134
+    XL = 610
+    XR = 650
+    YB = 200
+    YT = 230
     pixels = (XR - XL) * (YT - YB)
     dkh1 = 0
     dkh2 = 0
@@ -438,9 +439,9 @@ if __name__ == "__main__":
     writer = csv.writer(results)
     reader = csv.reader(results)
 
-    results2 = open('results2.csv','r+', newline='') 
-    writer2 = csv.writer(results2)
-    reader2 = csv.reader(results2)
+    #results2 = open('results2.csv','r+', newline='') 
+    #writer2 = csv.writer(results2)
+    #reader2 = csv.reader(results2)
 
 
     avgR, avgG, avgB = 0, 0, 0 
@@ -499,13 +500,13 @@ if __name__ == "__main__":
     #spin(21, 20, 1, 23.5059)
     #fill()
 
-    #spin(21, 20, 0, 7)
+    spin(21, 20, 0, 2)
 
     
     
     #flush()
     #spin(21, 20, 1, 2)
-    mixer()
+    #mixer()
     '''
     spin(21, 20, 0, 2)
 
