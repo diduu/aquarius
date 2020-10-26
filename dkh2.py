@@ -17,6 +17,7 @@ import sys
 import csv
 import datetime
 from twilio.rest import Client
+from graph import showGraph
 
 
 # Connect to pigpiod daemon
@@ -362,6 +363,8 @@ if __name__ == "__main__":
     new_name = f"{datetime.timestamp(datetime.now())}.csv"
     results = open(new_name, 'w', newline='') 
     writer = csv.writer(results)
+    test()
+    showGraph(new_name)
     # reader = csv.reader(results)
 
     #results2 = open('results2.csv','r+', newline='') 
